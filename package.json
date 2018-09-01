@@ -4,8 +4,16 @@
   "description": "My test discord bot",
   "main": "bot.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon bot.js"
   },
   "author": "Lord of Destiny",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^11.4.2",
+    "moment": "^2.22.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.4"
+  }
 }
