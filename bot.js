@@ -1,4 +1,4 @@
-const botSettings = require("./botSettings.json");
+const botSettings = require("./botSettings.json") || "empty";
 const Discord = require("discord.js");
 const moment = require("moment");
 const myTools = require("./myTools");
