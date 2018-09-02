@@ -144,4 +144,4 @@ bot.on("message", async message => {
   }
 });
 
-bot.login(botSettings.token);
+bot.login(proces.env.token || botSettings.token);
