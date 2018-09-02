@@ -16,13 +16,44 @@ class Warframe {
       .then(res => {
         this.data = new WorldState(res);
         let keyNames = Object.keys(this.data);
-        console.log(this.data.news);
+        console.log(keyNames);
+        console.log(this.data.fissures);
       })
       .catch(err => {
         console.log("Data wasn't retrieved!");
         console.log(err);
       });
   }
+
+  news() {}
+
+  alerts() {}
+
+  sortie() {}
+
+  syndicate() {}
+
+  fissures() {}
+
+  flashSales() {}
+
+  invasions() {}
+
+  darkSectors() {}
+
+  voidTrader() {}
+
+  dailyDeals() {}
+
+  simaris() {}
+
+  conclave() {}
+
+  earthCycle() {}
+
+  cetusCycle() {}
+
+  constructionProgress() {}
 }
 
 module.exports = Warframe;
