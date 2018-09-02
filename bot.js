@@ -20,6 +20,8 @@ const commands = {
 
 const color = "#F04747";
 
+let last = "";
+
 const dragonThumbnail =
   "https://orig00.deviantart.net/2d14/f/2014/206/8/3/dragon_portrait_by_aazure_dragon-d7s7qqi.png";
 
@@ -35,7 +37,7 @@ bot.on("ready", async () => {
 });
 
 bot.on("message", async message => {
-  if (message.author.bot) return;
+  //if (message.author.bot) return;
   if (message.channel.type === "dm") return;
 
   let messageArray = message.content.split(" ");
@@ -59,6 +61,7 @@ bot.on("message", async message => {
       embed.addField(commands[key], "```" + `${prefix}${key}` + "```");
     });
     message.channel.send(embed);
+    last = command;
     return;
   }
 
@@ -69,6 +72,7 @@ bot.on("message", async message => {
         message.author.id
       }> Unknown command! To get list of commands type ${prefix}help`
     );
+    last = command;
     return;
   }
 
@@ -92,22 +96,24 @@ bot.on("message", async message => {
         ).format("dddd, MMMM Do YYYY.")
       );
     message.channel.send(embed);
+    last = command;
     return;
   }
 
   if (command === `${prefix}talk`) {
     myTools.deleteMessage(message);
     message.channel.send(`${rest}`, { tts: true });
+    last = command;
     return;
   }
 
   if (command === `${prefix}didThanosKillMe`) {
     message.channel.send(myTools.snap());
+    last = command;
     return;
   }
 
   if (command === `${prefix}joke`) {
-    myTools.deleteMessage(message);
     axios
       .get("http://api.icndb.com/jokes/random")
       .then(res => {
@@ -119,6 +125,14 @@ bot.on("message", async message => {
       .catch(error => {
         console.log(error.stack);
       });
+    last = command;
+    return;
+  }
+
+  if (command === `${prefix}last`) {
+    if (last === "") return;
+    message.channel.send(`${last}`);
+    myTools.deleteMessage(message);
     return;
   }
 
@@ -141,6 +155,7 @@ bot.on("message", async message => {
     console.log(update.version);
     if (update.version !== "") embed.addField("Version", update.version);
     message.channel.send(embed);
+    last = command;
   }
 });
 
