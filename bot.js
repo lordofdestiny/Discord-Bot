@@ -11,16 +11,21 @@ const prefix = process.env.prefix/* || botSettings.prefix*/;
 
 const commands = {
   userinfo: "Get your info:",
-  talk: "Bot repeats what you tell him to:",
+  talk: "Bot says what you tell him to:",
   joke: "Bot tells you a joke: ",
-  didThanosKillMe: "Tells you if Thanos killed you with his snap:",
-  last: "Summons last command!",
-  update: "Gives you lates update info!!"
+  didThanosKillMe: "Tells you if Thanos killed you with his snap",
+  update: "Gives you lates update info!"
+};
+
+const commandFormat = {
+  userinfo: "",
+  talk: "<text> (tts)",
+  joke: "(tts)",
+  didThanosKillMe: "",
+  update: ""
 };
 
 const color = "#F04747";
-
-let last = "";
 
 const dragonThumbnail =
   "https://orig00.deviantart.net/2d14/f/2014/206/8/3/dragon_portrait_by_aazure_dragon-d7s7qqi.png";
@@ -37,13 +42,14 @@ bot.on("ready", async () => {
 });
 
 bot.on("message", async message => {
-  //if (message.author.bot) return;
+  if (message.author.bot) return;
   if (message.channel.type === "dm") return;
 
   let messageArray = message.content.split(" ");
   let command = messageArray[0];
   let args = messageArray.slice(1);
-  let rest = message.content.slice(command.length);
+
+  console.log(command);
 
   if (!command.startsWith(prefix)) {
     return;
@@ -58,10 +64,12 @@ bot.on("message", async message => {
         "https://orig00.deviantart.net/2d14/f/2014/206/8/3/dragon_portrait_by_aazure_dragon-d7s7qqi.png"
       );
     Object.keys(commands).forEach(key => {
-      embed.addField(commands[key], "```" + `${prefix}${key}` + "```");
+      embed.addField(
+        commands[key],
+        "```" + `${prefix}${key}` + ` ${commandFormat[key]}` + "```"
+      );
     });
     message.channel.send(embed);
-    last = command;
     return;
   }
 
@@ -72,7 +80,6 @@ bot.on("message", async message => {
         message.author.id
       }> Unknown command! To get list of commands type ${prefix}help`
     );
-    last = command;
     return;
   }
 
@@ -96,43 +103,36 @@ bot.on("message", async message => {
         ).format("dddd, MMMM Do YYYY.")
       );
     message.channel.send(embed);
-    last = command;
     return;
   }
 
   if (command === `${prefix}talk`) {
     myTools.deleteMessage(message);
-    message.channel.send(`${rest}`, { tts: true });
-    last = command;
+    let rest = message.content.slice(command.length).replace(" tts", "");
+    let doTts = args[args.length - 1] === "tts";
+    message.channel.send(`${rest}`, { tts: `${doTts}` });
     return;
   }
 
   if (command === `${prefix}didThanosKillMe`) {
     message.channel.send(myTools.snap());
-    last = command;
     return;
   }
 
   if (command === `${prefix}joke`) {
+    myTools.deleteMessage(message);
+    let doTts = args[args.length - 1] === "tts";
     axios
       .get("http://api.icndb.com/jokes/random")
       .then(res => {
         let joke = res.data.value.joke;
         message.channel.send(`${joke.split("&quot;").join('"')}`, {
-          tts: true
+          tts: `${doTts}`
         });
       })
       .catch(error => {
         console.log(error.stack);
       });
-    last = command;
-    return;
-  }
-
-  if (command === `${prefix}last`) {
-    if (last === "") return;
-    message.channel.send(`${last}`);
-    myTools.deleteMessage(message);
     return;
   }
 
@@ -155,7 +155,6 @@ bot.on("message", async message => {
     console.log(update.version);
     if (update.version !== "") embed.addField("Version", update.version);
     message.channel.send(embed);
-    last = command;
   }
 });
 
