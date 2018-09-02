@@ -7,7 +7,7 @@ const WarframeVersion = require("warframe-updates");
 const warframeVersion = new WarframeVersion();
 const bot = new Discord.Client({ disableEveryone: true });
 
-const prefix = process.env.token || botSettings.prefix;
+const prefix = process.env.token/* || botSettings.prefix*/;
 
 const commands = {
   userinfo: "Get your info:",
@@ -144,4 +144,4 @@ bot.on("message", async message => {
   }
 });
 
-bot.login(process.env.token || botSettings.token);
+bot.login(process.env.token/* || botSettings.token*/);
