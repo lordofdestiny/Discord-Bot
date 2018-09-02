@@ -19,8 +19,8 @@ const commands = {
 
 const commandFormat = {
   userinfo: "",
-  talk: "<text> <tts>",
-  joke: "<tts>",
+  talk: "<text> (tts)",
+  joke: "(tts)",
   didThanosKillMe: "",
   update: ""
 };
@@ -64,7 +64,10 @@ bot.on("message", async message => {
         "https://orig00.deviantart.net/2d14/f/2014/206/8/3/dragon_portrait_by_aazure_dragon-d7s7qqi.png"
       );
     Object.keys(commands).forEach(key => {
-      embed.addField(commands[key], "```" + `${prefix}${key}` + "```");
+      embed.addField(
+        commands[key],
+        "```" + `${prefix}${key}` + ` ${commandFormat[key]}` + "```"
+      );
     });
     message.channel.send(embed);
     return;
@@ -117,12 +120,14 @@ bot.on("message", async message => {
   }
 
   if (command === `${prefix}joke`) {
+    myTools.deleteMessage(message);
+    let doTts = args[args.length - 1] === "tts";
     axios
       .get("http://api.icndb.com/jokes/random")
       .then(res => {
         let joke = res.data.value.joke;
         message.channel.send(`${joke.split("&quot;").join('"')}`, {
-          tts: true
+          tts: `${doTts}`
         });
       })
       .catch(error => {
