@@ -1,9 +1,10 @@
+const axios = require("axios");
+const fs = require("fs");
+
 function deleteMessage(message) {
   message
     .delete(0)
-    .then(() => {
-      console.log("Message deleted!");
-    })
+    .then(() => {})
     .catch(error => {
       console.log(error.stack);
     });
@@ -17,7 +18,16 @@ function snap(id) {
   else return "You were spared by Thanos.";
 }
 
+function rbgIntToRgb(rbgInt) {
+  let blue = rbgInt & 255;
+  let green = (rbgInt >> 8) & 255;
+  let red = (rbgInt >> 16) & 255;
+
+  return [red, green, blue];
+}
+
 module.exports = {
   deleteMessage,
-  snap
+  snap,
+  rbgIntToRgb
 };
