@@ -6,11 +6,19 @@ const myTools = require("./myTools");
 const axios = require("axios");
 const WarframeVersion = require("warframe-updates");
 const warframeVersion = new WarframeVersion();
+const generateEmbed = require("./generate");
 const WorldState = require("warframe-worldstate-parser");
-const bot = new Discord.Client({ disableEveryone: true });
 let worldState;
 
+const bot = new Discord.Client({ disableEveryone: true });
+
 const prefix = process.env.prefix;
+
+const dragonThumbnail =
+  "https://orig00.deviantart.net/2d14/f/2014/206/8/3/dragon_portrait_by_aazure_dragon-d7s7qqi.png";
+const footerIcon =
+  "https://community.gophersvids.com/uploads/monthly_2015_07/Warframe_Logo_v1.png.66fa77f0af4dadc0b1a269016e9ab36a.png";
+const color = "#F04747";
 
 const commands = {
   // userinfo: {
@@ -39,14 +47,6 @@ const commands = {
   }
 };
 
-const color = "#F04747";
-
-const dragonThumbnail =
-  "https://orig00.deviantart.net/2d14/f/2014/206/8/3/dragon_portrait_by_aazure_dragon-d7s7qqi.png";
-
-const footerIcon =
-  "https://community.gophersvids.com/uploads/monthly_2015_07/Warframe_Logo_v1.png.66fa77f0af4dadc0b1a269016e9ab36a.png";
-
 bot.on("ready", async () => {
   bot
     .generateInvite(["ADMINISTRATOR"])
@@ -56,12 +56,15 @@ bot.on("ready", async () => {
     .catch(error => {
       console.log(error.stack);
     });
-  updateWorldState();
 });
 
 bot.on("message", async message => {
   if (message.author.bot) return;
   if (message.channel.type === "dm") return;
+
+  if (message.isMentioned(bot.user)) {
+    message.reply("Hey! Don't do it again!");
+  }
 
   let messageArray = message.content.split(" ");
   let command = messageArray[0];
@@ -76,9 +79,7 @@ bot.on("message", async message => {
     let embed = new Discord.RichEmbed()
       .setTitle("Command list")
       .setColor(color)
-      .setThumbnail(
-        "https://orig00.deviantart.net/2d14/f/2014/206/8/3/dragon_portrait_by_aazure_dragon-d7s7qqi.png"
-      );
+      .setThumbnail(dragonThumbnail);
     Object.keys(commands).forEach(key => {
       embed.addField(
         commands[key].info,
@@ -163,6 +164,7 @@ bot.on("message", async message => {
       .addField(
         "Date released: ",
         moment(message.author.createdAt, "YYYY-MM-DDTHH:mm:ss.000Z").format(
+          //Dont show date when author created account
           "dddd, MMMM Do YYYY. HH:mm:ss"
         )
       )
@@ -174,12 +176,13 @@ bot.on("message", async message => {
   }
 
   if (command == `${prefix}alerts`) {
-    console.log("awaiting!");
+    console.log("waiting!");
     await updateWorldState();
-    console.log("done!");
+    console.log("Done!");
     let pos = 0;
-    let embed = generateAlertEmbed(pos);
+    let embed = await generateEmbed.alertEmbed(pos, worldState); //Generate alert embed
     message.channel.send(embed).then(async sentMessage => {
+      //Add nav reactions
       await sentMessage.react("⏮");
       await sentMessage.react("◀");
       await sentMessage.react("▶");
@@ -195,34 +198,38 @@ bot.on("message", async message => {
           reaction.emoji.name === "⏭") &&
         user.id != bot.user.id;
       const collector = await sentMessage.createReactionCollector(filter, {
+        //Create reaction collector for 60s
         time: 60000
       });
       collector.on("collect", async reaction => {
+        //Decide on stuff
         let name = reaction.emoji.name;
+        console.log(name);
         if (name === "⏮") {
-          sentMessage.edit(generateAlertEmbed(0));
+          pos = 0;
+          sentMessage.edit(await generateEmbed.alertEmbed(pos, worldState));
         } else if (name === "◀") {
           if (pos > 0) {
-            pos--;
-            sentMessage.edit(generateAlertEmbed(pos));
+            posy--;
+            sentMessage.edit(await generateEmbed.alertEmbed(pos, worldState));
           }
         } else if (name === "▶") {
-          pos++;
-          sentMessage.edit(generateAlertEmbed(pos));
+          if (pos < worldState.alerts.length - 1) pos++;
+          sentMessage.edit(await generateEmbed.alertEmbed(pos, worldState));
         } else if (name === "⏭") {
           pos = worldState.alerts.length - 1;
-          sentMessage.edit(generateAlertEmbed(pos));
+          sentMessage.edit(await generateEmbed.alertEmbed(pos, worldState));
         }
         reaction.remove(message.author);
       });
-      collector.on("end", collected => {});
+      collector.on("end", collected => {}); //exit
     });
     return;
   }
 });
 
 async function updateWorldState() {
-  axios
+  await axios
     .get("http://content.warframe.com/dynamic/worldState.php")
     .then(res => {
       worldState = new WorldState(JSON.stringify(res.data));
@@ -231,44 +238,5 @@ async function updateWorldState() {
       console.log(error);
     });
 }
-
-generateAlertEmbed = pos => {
-  let alert = worldState.alerts[pos];
-
-  //Gets alert title
-  let str = alert.mission.reward.asString;
-  let inds = str.indexOf("+");
-  let trueRew = inds > -1 ? str.substring(0, inds - 1) : str;
-
-  let embed = new Discord.RichEmbed()
-    .setColor(myTools.rbgIntToRgb(alert.mission.reward.color))
-    .setThumbnail(alert.mission.reward.thumbnail)
-    .setTitle("[PC] " + trueRew)
-    .addField("Mission", alert.mission.faction + " " + alert.mission.type, true)
-    .addField("Loaction", alert.mission.node, true)
-    .addField(
-      "Level",
-      `${alert.mission.minEnemyLevel} - ${alert.mission.maxEnemyLevel}`,
-      true
-    )
-    .addField(
-      "Archwing Required: ",
-      alert.mission.archwingRequired ? "Yes" : "No",
-      true
-    )
-    .setFooter(
-      "Page " +
-        `${parseInt(pos) + 1}` +
-        `/${worldState.alerts.length} \u2022 ${
-          alert.eta
-        } remaining \u2022 Exiers after 60s`,
-      footerIcon
-    )
-    .setTimestamp();
-  if (!trueRew.startsWith(`${alert.mission.reward.credits}`)) {
-    embed.addField("\u200B", `**Credits: ** ${alert.mission.reward.credits}`);
-  }
-  return embed;
-};
 
 bot.login(process.env.token);
