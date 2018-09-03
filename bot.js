@@ -30,7 +30,7 @@ const commands = {
     add: "(tts)"
   },
   update: {
-    info: "Gives you lates Warframe update info!",
+    info: "Gives you info on lates Warframe update!",
     add: ""
   },
   alerts: {
@@ -67,8 +67,6 @@ bot.on("message", async message => {
   let command = messageArray[0];
   let args = messageArray.slice(1);
 
-  console.log(command);
-
   if (!command.startsWith(prefix)) {
     return;
   }
@@ -76,7 +74,7 @@ bot.on("message", async message => {
   if (command === `${prefix}help`) {
     //If user asks for help
     let embed = new Discord.RichEmbed()
-      .setAuthor("Command list:")
+      .setTitle("Command list")
       .setColor(color)
       .setThumbnail(
         "https://orig00.deviantart.net/2d14/f/2014/206/8/3/dragon_portrait_by_aazure_dragon-d7s7qqi.png"
@@ -93,10 +91,8 @@ bot.on("message", async message => {
 
   if (!(command.slice(1) in commands)) {
     //if users enters unexisting command
-    message.channel.send(
-      `<@${
-        message.author.id
-      }> Unknown command! To get list of commands type ${prefix}help`
+    message.reply(
+      `Unknown command! To get list of commands type ${prefix}help`
     );
     return;
   }
@@ -134,7 +130,7 @@ bot.on("message", async message => {
 
   if (command === `${prefix}didThanosKillMe`) {
     let doTts = args[args.length - 1] === "tts";
-    message.channel.send(`<@${message.author.id}> ${myTools.snap()}`, {
+    message.reply(`${myTools.snap()}`, {
       tts: `${doTts}`
     });
     return;
@@ -178,50 +174,54 @@ bot.on("message", async message => {
   }
 
   if (command == `${prefix}alerts`) {
-    updateWorldState();
-    for (let pos in worldState.alerts) {
-      let alert = worldState.alerts[pos];
-      let str = alert.mission.reward.asString;
-      let inds = str.indexOf("+");
-      let trueRew = inds > -1 ? str.substring(0, inds - 1) : str;
-
-      console.log(str);
-      let embed = new Discord.RichEmbed()
-        .setColor(myTools.rbgIntToRgb(alert.mission.reward.color))
-        .setThumbnail(alert.mission.reward.thumbnail)
-        .setTitle("[PC] " + trueRew)
-        .addField(
-          "Mission",
-          alert.mission.faction + " " + alert.mission.type,
-          true
-        )
-        .addField("Loaction", alert.mission.node, true)
-        .addField(
-          "Level",
-          `${alert.mission.minEnemyLevel} - ${alert.mission.maxEnemyLevel}`,
-          true
-        )
-        .addField(
-          "Archwing Required: ",
-          alert.mission.archwingRequired ? "Yes" : "No",
-          true
-        )
-        .addField("\u200B", `**Credits: ** ${alert.mission.reward.credits}`)
-        .setFooter(
-          "Page " +
-            `${parseInt(pos) + 1}` +
-            `/${worldState.alerts.length} \u2022 ` +
-            alert.eta +
-            " remaining",
-          footerIcon
-        )
-        .setTimestamp();
-      message.channel.send(embed);
-    }
+    console.log("awaiting!");
+    await updateWorldState();
+    console.log("done!");
+    let pos = 0;
+    let embed = generateAlertEmbed(pos);
+    message.channel.send(embed).then(async sentMessage => {
+      await sentMessage.react("⏮");
+      await sentMessage.react("◀");
+      await sentMessage.react("▶");
+      await sentMessage.react("⏭");
+      const filter = (
+        //check only for those emoji's
+        reaction,
+        user
+      ) =>
+        (reaction.emoji.name === "⏮" ||
+          reaction.emoji.name === "◀" ||
+          reaction.emoji.name === "▶" ||
+          reaction.emoji.name === "⏭") &&
+        user.id != bot.user.id;
+      const collector = await sentMessage.createReactionCollector(filter, {
+        time: 60000
+      });
+      collector.on("collect", async reaction => {
+        let name = reaction.emoji.name;
+        if (name === "⏮") {
+          sentMessage.edit(generateAlertEmbed(0));
+        } else if (name === "◀") {
+          if (pos > 0) {
+            pos--;
+            sentMessage.edit(generateAlertEmbed(pos));
+          }
+        } else if (name === "▶") {
+          pos++;
+          sentMessage.edit(generateAlertEmbed(pos));
+        } else if (name === "⏭") {
+          pos = worldState.alerts.length - 1;
+          sentMessage.edit(generateAlertEmbed(pos));
+        }
+        reaction.remove(message.author);
+      });
+      collector.on("end", collected => {});
+    });
+    return;
   }
 });
 
-updateWorldState = () => {
+async function updateWorldState() {
   axios
     .get("http://content.warframe.com/dynamic/worldState.php")
     .then(res => {
@@ -230,6 +230,45 @@ updateWorldState = () => {
     .catch(error => {
       console.log(error);
     });
+}
+
+generateAlertEmbed = pos => {
+  let alert = worldState.alerts[pos];
+
+  //Gets alert title
+  let str = alert.mission.reward.asString;
+  let inds = str.indexOf("+");
+  let trueRew = inds > -1 ? str.substring(0, inds - 1) : str;
+
+  let embed = new Discord.RichEmbed()
+    .setColor(myTools.rbgIntToRgb(alert.mission.reward.color))
+    .setThumbnail(alert.mission.reward.thumbnail)
+    .setTitle("[PC] " + trueRew)
+    .addField("Mission", alert.mission.faction + " " + alert.mission.type, true)
+    .addField("Loaction", alert.mission.node, true)
+    .addField(
+      "Level",
+      `${alert.mission.minEnemyLevel} - ${alert.mission.maxEnemyLevel}`,
+      true
+    )
+    .addField(
+      "Archwing Required: ",
+      alert.mission.archwingRequired ? "Yes" : "No",
+      true
+    )
+    .setFooter(
+      "Page " +
+        `${parseInt(pos) + 1}` +
+        `/${worldState.alerts.length} \u2022 ${
+          alert.eta
+        } remaining \u2022 Exiers after 60s`,
+      footerIcon
+    )
+    .setTimestamp();
+  if (!trueRew.startsWith(`${alert.mission.reward.credits}`)) {
+    embed.addField("\u200B", `**Credits: ** ${alert.mission.reward.credits}`);
+  }
+  return embed;
 };
 
 bot.login(process.env.token);
