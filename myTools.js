@@ -1,6 +1,3 @@
-const axios = require("axios");
-const fs = require("fs");
-
 function deleteMessage(message) {
   message
     .delete(0)
