@@ -1,12 +1,11 @@
 require("dotenv").config();
-
 const Discord = require("discord.js");
 const moment = require("moment");
-const myTools = require("./myTools");
+const myTools = require("./Helpers/myTools");
 const axios = require("axios");
 const WarframeVersion = require("warframe-updates");
 const warframeVersion = new WarframeVersion();
-const generateEmbed = require("./generate");
+const generateEmbed = require("./Helpers/generate");
 const WorldState = require("warframe-worldstate-parser");
 let worldState;
 
@@ -21,28 +20,36 @@ const footerIcon =
 const color = "#F04747";
 
 const commands = {
-  // userinfo: {
-  //   info: "Get your info:",
-  //   add: ""
-  // },
   talk: {
     info: "Bot says what you tell him to:",
-    add: "<text> (tts)"
+    add: "<text> *tts"
   },
   joke: {
     info: "Bot tells you a joke: ",
-    add: "(tts)"
+    add: "*tts"
   },
   didThanosKillMe: {
     info: "Tells you if Thanos killed you with his snap",
-    add: "(tts)"
+    add: "*tts"
   },
-  update: {
-    info: "Gives you info on lates Warframe update!",
+  // update: {
+  //   info: "Gives you info on lates Warframe update!",
+  //   add: ""
+  // },
+  alerts: {
+    info: "List currsnt Alerts!",
     add: ""
   },
-  alerts: {
-    info: "Gives you list of currsnt alerts!",
+  invasions: {
+    info: "List current Invasions!",
+    add: ""
+  },
+  sortie: {
+    info: "Current sortie missions!",
+    add: ""
+  },
+  sorry: {
+    info: "Fixes sams hate for you!",
     add: ""
   }
 };
@@ -62,64 +69,34 @@ bot.on("message", async message => {
   if (message.author.bot) return;
   if (message.channel.type === "dm") return;
 
-  if (message.isMentioned(bot.user)) {
-    message.reply("Hey! Don't do it again!");
-  }
-
   let messageArray = message.content.split(" ");
   let command = messageArray[0];
   let args = messageArray.slice(1);
+
+  if (message.isMentioned(bot.user)) {
+    message.reply("Don't do that ever again!!!  (╯°□°）╯︵ ┻━┻");
+  }
 
   if (!command.startsWith(prefix)) {
     return;
   }
 
+  if (command === `${prefix}sorry`) {
+    message.reply("You saved yourself. ┬─┬ ノ( ゜-゜ノ)");
+  }
+
   if (command === `${prefix}help`) {
     //If user asks for help
-    let embed = new Discord.RichEmbed()
-      .setTitle("Command list")
-      .setColor(color)
-      .setThumbnail(dragonThumbnail);
-    Object.keys(commands).forEach(key => {
-      embed.addField(
-        commands[key].info,
-        "```" + `${prefix}${key}` + ` ${commands[key].add}` + "```"
-      );
-    });
+    let embed = await generateEmbed.helpEmbed(commands);
     message.channel.send(embed);
     return;
   }
 
   if (!(command.slice(1) in commands)) {
     //if users enters unexisting command
-    message.reply(
-      `Unknown command! To get list of commands type ${prefix}help`
-    );
+    message.reply(`¯\\_(ツ)_/¯ To get list of commands type ${prefix}help`);
     return;
   }
-
-  // if (command === `${prefix}userinfo`) {
-  //   //if user aks for his info
-  //   let embed = new Discord.RichEmbed()
-  //     .setAuthor(message.author.username)
-  //     .setDescription(`This is the ${message.author.username}'s info!`)
-  //     .setColor(color)
-  //     .setThumbnail(message.author.avatarURL)
-  //     .addField(
-  //       "Full Username",
-  //       `${message.author.username}#${message.author.discriminator}`
-  //     )
-  //     .addField("ID", message.author.id)
-  //     .addField(
-  //       "Created At",
-  //       moment(
-  //         message.author.createdAt,
-  //         "ddd MMM DD YYYY HH:mm:ss GMT+-HHmm"
-  //       ).format("dddd, MMMM Do YYYY.")
-  //     );
-  //   message.channel.send(embed);
-  //   return;
-  // }
 
   if (command === `${prefix}talk`) {
     myTools.deleteMessage(message);
@@ -154,26 +131,26 @@ bot.on("message", async message => {
     return;
   }
 
-  if (command === `${prefix}update`) {
-    let update = warframeVersion;
-    let embed = new Discord.RichEmbed()
-      .setAuthor(update.title)
-      .setDescription(update.link)
-      .setImage(update.image)
-      .setColor(color)
-      .addField(
-        "Date released: ",
-        moment(message.author.createdAt, "YYYY-MM-DDTHH:mm:ss.000Z").format(
-          //Dont show date when author created account
-          "dddd, MMMM Do YYYY. HH:mm:ss"
-        )
-      )
-      .setThumbnail(
-        "https://www.bleedingcool.com/wp-content/uploads/2017/12/warframe-Logo.jpg"
-      );
-    if (update.version !== "") embed.addField("Version", update.version);
-    message.channel.send(embed);
-  }
+  // if (command === `${prefix}update`) {
+  //   let update = warframeVersion;
+  //   let embed = new Discord.RichEmbed()
+  //     .setAuthor(update.title)
+  //     .setDescription(update.link)
+  //     .setImage(update.image)
+  //     .setColor(color)
+  //     .addField(
+  //       "Date released: ",
+  //       moment(message.author.createdAt, "YYYY-MM-DDTHH:mm:ss.000Z").format(
+  //         //Dont show date when author created account
+  //         "dddd, MMMM Do YYYY. HH:mm:ss"
+  //       )
+  //     )
+  //     .setThumbnail(
+  //       "https://www.bleedingcool.com/wp-content/uploads/2017/12/warframe-Logo.jpg"
+  //     );
+  //   if (update.version !== "") embed.addField("Version", update.version);
+  //   message.channel.send(embed);
+  // }
 
   if (command == `${prefix}alerts`) {
     console.log("waiting!");
@@ -210,7 +187,7 @@ bot.on("message", async message => {
           sentMessage.edit(await generateEmbed.alertEmbed(pos, worldState));
         } else if (name === "◀") {
           if (pos > 0) {
-            posy--;
+            pos--;
             sentMessage.edit(await generateEmbed.alertEmbed(pos, worldState));
           }
         } else if (name === "▶") {
@@ -225,6 +202,18 @@ bot.on("message", async message => {
       collector.on("end", collected => {}); //exit
     });
     return;
+  }
+
+  if (command === `${prefix}invasions`) {
+    await updateWorldState();
+    let embed = await generateEmbed.invasionEmbed(worldState);
+    message.channel.send(embed);
+  }
+
+  if (command === `${prefix}sortie`) {
+    await updateWorldState();
+    let embed = await generateEmbed.sortieEmbed(worldState);
+    message.channel.send(embed);
   }
 });
 
