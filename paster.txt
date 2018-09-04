@@ -1,0 +1,53 @@
+--timestamp--
+news
+events
+--alerts--
+--sortie--
+syndicateMissions
+fissures
+globalUpgrades
+flashSales
+--invasions--
+darkSectors
+voidTrader
+dailyDeals
+simaris
+conclaveChallenges
+persistentEnemies
+earthCycle
+cetusCycle
+constructionProgress
+
+-----------------------------------------------
+
+Sortie {
+  id: '5b8d5a821831e1c8528b422c',
+  activation: 2018-09-03T16:00:02.036Z,
+  expiry: 2018-09-04T15:59:00.000Z,
+  rewardPool: 'Sortie Rewards',
+  variants:
+   [ SortieVariant {
+       boss: 'Deprecated',
+       planet: 'Deprecated',
+       missionType: 'Mobile Defense',
+       modifier: 'Weapon Restriction: Pistol Only',
+       modifierDescription: 'Only secondary weapons may be used in this mission, any other weapon type is not allowed, and will be removed automatically if equipped.',
+       node: 'V Prime (Venus)' },
+     SortieVariant {
+       boss: 'Deprecated',
+       planet: 'Deprecated',
+       missionType: 'Extermination',
+       modifier: 'Enemy Physical Enhancement: Impact',
+       modifierDescription: 'Enemies can deal enhanced impact damage. Finishing damage is not resisted.',
+       node: 'Ananke (Jupiter)' },
+     SortieVariant {
+       boss: 'Deprecated',
+       planet: 'Deprecated',
+       missionType: 'Assassination',
+       modifier: 'Eximus Stronghold',
+       modifierDescription: 'Eximus units have a much higher spawn rate in this mission. Some of their auras stack.',
+       node: 'Iliad (Phobos)' } ],
+  boss: 'Nef Anyo',
+  faction: 'Corpus',
+  expired: false,
+  eta: '1h 46m 31s' }
