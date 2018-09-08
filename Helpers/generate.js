@@ -1,6 +1,7 @@
 require("dotenv").config();
 const Discord = require("discord.js");
 const myTools = require("./myTools");
+const moment = require("moment");
 const footerIcon =
   "https://community.gophersvids.com/uploads/monthly_2015_07/Warframe_Logo_v1.png.66fa77f0af4dadc0b1a269016e9ab36a.png";
 const dragonThumbnail =
@@ -21,6 +22,27 @@ async function helpEmbed(commands) {
       "```" + `${prefix}${key}` + ` ${commands[key].add}` + "```"
     );
   });
+  return embed;
+}
+
+async function userEmbed(row, user) {
+  let level = row.level;
+  let points = row.points;
+  let embed = new Discord.RichEmbed()
+    .setTitle(user.username)
+    .setDescription(`${user.tag}`)
+    .setThumbnail(user.avatarURL)
+    .setColor(color)
+    .setFooter("Sent", dragonThumbnail)
+    .setTimestamp()
+    .addField("Level", level, true)
+    .addField("XP", points, true)
+    .addField(
+      "Acount Created At",
+      moment(user.createdAt, "YYYY-MM-DDTHH:mm:ss.000Z").format(
+        "dddd, MMMM Do YYYY. HH:mm:ss"
+      )
+    );
   return embed;
 }
 
@@ -100,10 +122,12 @@ async function sortieEmbed(worldState) {
     .setTitle("[PC] Sortie")
     .setDescription(`Agianst: ${sortie.faction} - **${sortie.boss}**`)
     .setColor(color)
-    .setThumbnail(dragonThumbnail)
-    .setFooter(sortie.eta, footerIcon)
+    .setThumbnail(
+      "https://vignette.wikia.nocookie.net/warframe/images/1/15/Sortie_b.png/revision/latest?cb=20151217134250"
+    )
+    .setFooter(`${sortie.eta} remaining`, footerIcon)
     .setTimestamp();
-  for (mission of sortie.variants) {
+  for (let mission of sortie.variants) {
     embed.addField(
       `${mission.node} - ${mission.missionType}`,
       `${mission.modifier}`
@@ -112,9 +136,55 @@ async function sortieEmbed(worldState) {
   return embed;
 }
 
+async function fissuresEmbed(worldState) {
+  let embed = new Discord.RichEmbed()
+    .setTitle("[PC] Fissures")
+    .setDescription("Currently active Fissures")
+    .setColor(color)
+    .setFooter("Sent", footerIcon)
+    .setThumbnail(
+      "https://vignette.wikia.nocookie.net/warframe/images/5/57/VoidTearIcon_b.png/revision/latest?cb=20160713085454"
+    )
+    .setTimestamp();
+  for (let fissure of worldState.fissures) {
+    if (!fissure.expired)
+      embed.addField(
+        `${fissure.tier} ${fissure.enemy} ${fissure.missionType}`,
+        `${fissure.node} [${fissure.eta}]`
+      );
+  }
+  return embed;
+}
+
+async function BaroEmbed(worldState) {
+  let baro = worldState.voidTrader;
+  let embed = new Discord.RichEmbed()
+    .setTitle("Void Trader")
+    .setColor(color)
+    .setFooter("Sent", footerIcon)
+    .setTimestamp()
+    .setThumbnail("http://i.imgur.com/z0wU29P.png");
+  if (!baro.active) {
+    embed.addField(`Landing in: ${baro.startString}`);
+  } else {
+    for (let thing of baro.inventory) {
+      embed.addField(
+        thing.item,
+        `${thing.ducats} Ducats + ${thing.credits} credits`,
+        true
+      );
+    }
+    embed.addField(`Time left in ${baro.location}: `, baro.endString);
+  }
+  return embed;
+}
+
 module.exports = {
   helpEmbed,
+  userEmbed,
   alertEmbed,
   invasionEmbed,
-  sortieEmbed
+  sortieEmbed,
+  fissuresEmbed,
+  BaroEmbed
 };

@@ -1,0 +1,42 @@
+{
+  "talk": {
+    "info": "Bot says what you tell him to:",
+    "add": "<text> *tts"
+  },
+  "joke": {
+    "info": "Bot tells you a joke: ",
+    "add": "*tts"
+  },
+  "didThanosKillMe": {
+    "info": "Tells you if Thanos killed you with his snap",
+    "add": "*tts"
+  },
+  "profile": {
+    "info": "View score and level!",
+    "add": ""
+  },
+  "sorry": {
+    "info": "Fixes sams hate for you!",
+    "add": ""
+  },
+  "alerts": {
+    "info": "List currsnt Alerts!",
+    "add": ""
+  },
+  "invasions": {
+    "info": "List current Invasions!",
+    "add": ""
+  },
+  "sortie": {
+    "info": "Current Sortie missions!",
+    "add": ""
+  },
+  "fissures": {
+    "info": "Current Fissure missions!",
+    "add": ""
+  },
+  "baro": {
+    "info": "Shows stuff abot Baro Ki'Teer!",
+    "add": ""
+  }
+}

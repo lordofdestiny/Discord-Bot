@@ -4,12 +4,12 @@ events
 --alerts--
 --sortie--
 syndicateMissions
-fissures
+--fissures--
 globalUpgrades
 flashSales
 --invasions--
 darkSectors
-voidTrader
+--voidTrader--
 dailyDeals
 simaris
 conclaveChallenges
