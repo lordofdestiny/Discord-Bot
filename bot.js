@@ -198,6 +198,12 @@ bot.on("message", async message => {
     return;
   }
 
+  if (command === `${prefix}creator`) {
+    message.reply(
+      'I was created by Branislav Đumić, a student of ETŠ "Rade Končar", Beograd'
+    );
+  }
+
   if (!(command.slice(1) in commands)) {
     //if users enters unexisting command
     message.reply(`To get list of commands type ${prefix}help`);
