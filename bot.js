@@ -1,25 +1,34 @@
 require("dotenv").config();
 const Discord = require("discord.js");
 const moment = require("moment");
-const sql = require("sqlite");
-const myTools = require("./Helpers/myTools");
-const axios = require("axios");
-const WarframeVersion = require("warframe-updates");
-const warframeVersion = new WarframeVersion();
+const fs = require("fs");
+//const myTools = require("./Helpers/myTools");
+// const WarframeVersion = require("warframe-updates");
+// const warframeVersion = new WarframeVersion();
 const generateEmbed = require("./Helpers/generate");
-const WorldState = require("warframe-worldstate-parser");
-const handleInteractives = require("./Helpers/handleIntereactives");
-const commands = require("./commands.json");
-let worldState;
-const bot = new Discord.Client({ disableEveryone: true });
-const prefix = process.env.prefix;
-const dragonThumbnail =
-  "https://orig00.deviantart.net/2d14/f/2014/206/8/3/dragon_portrait_by_aazure_dragon-d7s7qqi.png";
-const footerIcon =
-  "https://community.gophersvids.com/uploads/monthly_2015_07/Warframe_Logo_v1.png.66fa77f0af4dadc0b1a269016e9ab36a.png";
-const color = "#F04747";
+const { prefix, token, serviceAccount } = process.env;
 
-sql.open("./database.sqlite");
+const bot = new Discord.Client({ disableEveryone: true });
+bot.commands = new Discord.Collection();
+
+fs.readdir("./commands", (err, files) => {
+  if (err) console.log(error);
+
+  let jsFiles = files.filter(f => f.split(".").pop() === "js");
+
+  if (jsFiles.length <= 0) console.log("No commands found!");
+
+  console.log(`Loading ${jsFiles.length} files...`);
+
+  jsFiles.forEach((f, i) => {
+    let props = require(`./commands/${f}`);
+    console.log(`Loading ${i + 1}. command... `);
+    bot.commands.set(props.help.name, props);
+  });
+  console.log("All commands loaded!");
+});
+
+//sql.open("./database.sqlite");
 
 bot.on("ready", async () => {
   bot
@@ -39,9 +48,9 @@ bot.on("message", async message => {
   let messageArray = message.content.split(" ");
   let command = messageArray[0];
   let args = messageArray.slice(1);
-  var flag = false;
+  // var flag = false;
 
-  await sql //Load hate
+  /* await sql //Load hate
     .get(`SELECT * FROM hates WHERE userId = "${message.author.id}"`)
     .then(row => {
       if (row.hated) {
@@ -153,14 +162,18 @@ bot.on("message", async message => {
             [message.author.id, 1, 0]
           );
         });
-    });
+    }); */
 
   if (!command.startsWith(prefix)) {
     return;
   }
 
+  let cmd = bot.commands.get(command.slice(prefix.length));
+  if (cmd) cmd.run(bot, message, args);
+  else message.reply(`To get list of commands type ${prefix}help`);
+
   if (command === `${prefix}sorry`) {
-    sql
+    /* sql
       .get(`SELECT * FROM hates WHERE userId = "${message.author.id}" `)
       .then(row => {
         if (!row || (!row.hated && !row.warned)) {
@@ -183,65 +196,13 @@ bot.on("message", async message => {
           message.reply("It's just a warning, no sorry yet!");
         }
       });
-    return;
+    return; */
   }
 
-  if (flag) {
+  /* if (flag) {
     message.reply("¯\\_(ツ)_/¯");
     return;
-  }
-
-  if (command === `${prefix}help`) {
-    //If user asks for help
-    let embed = await generateEmbed.helpEmbed(commands);
-    message.channel.send(embed);
-    return;
-  }
-
-  if (command === `${prefix}creator`) {
-    message.reply(
-      'I was created by Branislav Đumić, a student of ETŠ "Rade Končar", Beograd'
-    );
-  }
-
-  if (!(command.slice(1) in commands)) {
-    //if users enters unexisting command
-    message.reply(`To get list of commands type ${prefix}help`);
-    return;
-  }
-
-  if (command === `${prefix}talk`) {
-    myTools.deleteMessage(message);
-    let rest = message.content.slice(command.length).replace(" tts", "");
-    let doTts = args[args.length - 1] === "tts";
-    message.channel.send(`${rest}`, { tts: `${doTts}` });
-    return;
-  }
-
-  if (command === `${prefix}didThanosKillMe`) {
-    let doTts = args[args.length - 1] === "tts";
-    message.reply(`${myTools.snap()}`, {
-      tts: `${doTts}`
-    });
-    return;
-  }
-
-  if (command === `${prefix}joke`) {
-    myTools.deleteMessage(message);
-    let doTts = args[args.length - 1] === "tts";
-    axios
-      .get("http://api.icndb.com/jokes/random")
-      .then(res => {
-        let joke = res.data.value.joke;
-        message.channel.send(`${joke.split("&quot;").join('"')}`, {
-          tts: `${doTts}`
-        });
-      })
-      .catch(error => {
-        console.log(error.stack);
-      });
-    return;
-  }
+  } */
 
   // if (command === `${prefix}update`) {
   //   let update = warframeVersion;
@@ -265,20 +226,14 @@ bot.on("message", async message => {
   // }
 
   if (command === `${prefix}profile`) {
-    sql
+    /* sql
       .get(`SELECT * FROM scores WHERE userId ="${message.author.id}"`)
       .then(async row => {
         if (!row) return message.reply("Your current level is 0");
         let embed = await generateEmbed.userEmbed(row, message.author);
 
         message.channel.send(embed);
-      });
-  }
-
-  if (command === `${prefix}alerts`) {
-    await updateWorldState();
-    handleInteractives.handleAlerts(message, worldState, bot.user.id);
-    return;
+      }); */
   }
 
   if (command === `${prefix}invasions`) {
@@ -310,15 +265,4 @@ bot.on("message", async message => {
   }
 });
 
-async function updateWorldState() {
-  await axios
-    .get("http://content.warframe.com/dynamic/worldState.php")
-    .then(res => {
-      worldState = new WorldState(JSON.stringify(res.data));
-    })
-    .catch(error => {
-      console.log(error);
-    });
-}
-
-bot.login(process.env.token);
+bot.login(token);
