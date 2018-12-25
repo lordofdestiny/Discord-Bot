@@ -40,7 +40,10 @@ let makeEmbed = (pos, wordlstate) => {
   if (!trueRew.startsWith(`${reward.credits}`)) {
     embed.addField("\u200B", `**Credits: ** ${reward.credits}`);
   }
-  return embed;
+  return {
+    embed,
+    files: [{ attachment: `images/${footerIcon}` }]
+  };
 };
 
 module.exports.run = (bot, message, args) => {
@@ -48,55 +51,50 @@ module.exports.run = (bot, message, args) => {
     let pos = 0;
     botID = bot.user.id;
     let embed = makeEmbed(pos, worldstate);
-    message.channel
-      .send({
-        embed,
-        files: [{ attachment: `images/${footerIcon}` }]
-      })
-      .then(sentMsg => {
-        //Add nav reactions
-        sentMsg.react("⏮").then(() => {
-          sentMsg.react("◀").then(() => {
-            sentMsg.react("▶").then(() => {
-              sentMsg.react("⏭").then(() => {
-                const filter = (reaction, user) => {
-                  let { name } = reaction.emoji;
-                  return (
-                    (name === "⏮" ||
-                      name === "◀" ||
-                      name === "▶" ||
-                      name === "⏭") &&
-                    user.id != botID
-                  );
-                };
-                const collector = sentMsg.createReactionCollector(filter, {
-                  time: 30000
-                });
-                collector.on("collect", reaction => {
-                  let { name } = reaction.emoji;
-                  if (name === "⏮") pos = 0;
-                  else if (name === "◀") pos -= pos > 0 ? -1 : 0;
-                  else if (name === "▶")
-                    pos += pos < worldstate.alerts.length - 1 ? 1 : 0;
-                  else if (name === "⏭") pos = worldstate.alerts.length - 1;
-                  let embed = makeEmbed(pos, worldstate);
-                  sentMsg.edit({
-                    embed,
-                    files: [{ attachment: `images/${footerIcon}` }]
-                  });
-                  reaction.remove(message.author);
-                });
-                collector.on("end", collected => {});
+    message.channel.send(embed).then(sentMsg => {
+      //Add nav reactions
+      sentMsg.react("⏮").then(() => {
+        sentMsg.react("◀").then(() => {
+          sentMsg.react("▶").then(() => {
+            sentMsg.react("⏭").then(() => {
+              const filter = (reaction, user) => {
+                let { name } = reaction.emoji;
+                return (
+                  (name === "⏮" ||
+                    name === "◀" ||
+                    name === "▶" ||
+                    name === "⏭") &&
+                  user.id != botID
+                );
+              };
+              const collector = sentMsg.createReactionCollector(filter, {
+                time: 30000
               });
+              collector.on("collect", reaction => {
+                let { name } = reaction.emoji;
+                if (name === "⏮") pos = 0;
+                else if (name === "◀") pos -= pos > 0 ? -1 : 0;
+                else if (name === "▶")
+                  pos += pos < worldstate.alerts.length - 1 ? 1 : 0;
+                else if (name === "⏭") pos = worldstate.alerts.length - 1;
+                let embed = makeEmbed(pos, worldstate);
+                sentMsg.edit({
+                  embed,
+                  files: [{ attachment: `images/${footerIcon}` }]
+                });
+                reaction.remove(message.author);
+              });
+              collector.on("end", collected => {});
             });
           });
         });
       });
+    });
   });
 };
 
 module.exports.help = {
   name: "alerts",
-  title: "List currsnt Alerts!",
+  title: "List current Alerts!",
   add: ""
 };

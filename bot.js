@@ -5,8 +5,8 @@ const fs = require("fs");
 //const myTools = require("./Helpers/myTools");
 // const WarframeVersion = require("warframe-updates");
 // const warframeVersion = new WarframeVersion();
-const generateEmbed = require("./Helpers/generate");
-const { prefix, token, serviceAccount } = process.env;
+const { prefix, token } = process.env;
+const myTools = require("./Helpers/myTools");
 
 const bot = new Discord.Client({ disableEveryone: true });
 bot.commands = new Discord.Collection();
@@ -22,7 +22,7 @@ fs.readdir("./commands", (err, files) => {
 
   jsFiles.forEach((f, i) => {
     let props = require(`./commands/${f}`);
-    console.log(`Loading ${i + 1}. command... `);
+    //console.log(`Loading ${i + 1}. command... `);
     bot.commands.set(props.help.name, props);
   });
   console.log("All commands loaded!");
@@ -168,12 +168,29 @@ bot.on("message", async message => {
     return;
   }
 
-  let cmd = bot.commands.get(command.slice(prefix.length));
-  if (cmd) cmd.run(bot, message, args);
-  else message.reply(`To get list of commands type ${prefix}help`);
+  if (command === `${prefix}key`) {
+    myTools.updateWorldState().then(worldstate => {
+      console.log(command);
+      console.log(args);
+      let keys = Object.keys(worldstate[args[0]][0]);
+      keys.forEach((key, i) => {
+        console.log(
+          `${i}. ${key} => Type: ${typeof worldstate[args[0]][0][key]}`
+        );
+      });
+      console.log(worldstate[args[0]][0]);
+    });
+    return;
+  }
 
-  if (command === `${prefix}sorry`) {
-    /* sql
+  let cmd = bot.commands.get(command.slice(prefix.length));
+  if (cmd) {
+    cmd.run(bot, message, args);
+    console.log(`Served !${cmd.help.name} to ${message.author.username}`);
+  } else message.reply(`To get list of commands type ${prefix}help`);
+
+  /*  if (command === `${prefix}sorry`) {
+    sql
       .get(`SELECT * FROM hates WHERE userId = "${message.author.id}" `)
       .then(row => {
         if (!row || (!row.hated && !row.warned)) {
@@ -196,73 +213,47 @@ bot.on("message", async message => {
           message.reply("It's just a warning, no sorry yet!");
         }
       });
-    return; */
-  }
+    return; 
+  } */
 
   /* if (flag) {
     message.reply("¯\\_(ツ)_/¯");
     return;
   } */
 
-  // if (command === `${prefix}update`) {
-  //   let update = warframeVersion;
-  //   let embed = new Discord.RichEmbed()
-  //     .setAuthor(update.title)
-  //     .setDescription(update.link)
-  //     .setImage(update.image)
-  //     .setColor(color)
-  //     .addField(
-  //       "Date released: ",
-  //       moment(message.author.createdAt, "YYYY-MM-DDTHH:mm:ss.000Z").format(
-  //         //Dont show date when author created account
-  //         "dddd, MMMM Do YYYY. HH:mm:ss"
-  //       )
-  //     )
-  //     .setThumbnail(
-  //       "https://www.bleedingcool.com/wp-content/uploads/2017/12/warframe-Logo.jpg"
-  //     );
-  //   if (update.version !== "") embed.addField("Version", update.version);
-  //   message.channel.send(embed);
-  // }
+  /*  if (command === `${prefix}update`) {
+    let update = warframeVersion;
+    let embed = new Discord.RichEmbed()
+      .setAuthor(update.title)
+      .setDescription(update.link)
+      .setImage(update.image)
+      .setColor(color)
+      .addField(
+        "Date released: ",
+        moment(message.author.createdAt, "YYYY-MM-DDTHH:mm:ss.000Z").format(
+  show date when author created account
+          "dddd, MMMM Do YYYY. HH:mm:ss"
+        )
+      )
+      .setThumbnail(
+        "https://www.bleedingcool.com/wp-content/uploads/2017/12/warframe-Logo.jpg"
+      );
+    if (update.version !== "") embed.addField("Version", update.version);
+    message.channel.send(embed);
+  } */
 
-  if (command === `${prefix}profile`) {
-    /* sql
+  /* if (command === `${prefix}profile`) {
+     sql
       .get(`SELECT * FROM scores WHERE userId ="${message.author.id}"`)
       .then(async row => {
         if (!row) return message.reply("Your current level is 0");
         let embed = await generateEmbed.userEmbed(row, message.author);
 
         message.channel.send(embed);
-      }); */
-  }
-
-  if (command === `${prefix}invasions`) {
-    await updateWorldState();
-    let embed = await generateEmbed.invasionEmbed(worldState);
-    message.channel.send(embed);
-    return;
-  }
-
-  if (command === `${prefix}sortie`) {
-    await updateWorldState();
-    let embed = await generateEmbed.sortieEmbed(worldState);
-    message.channel.send(embed);
-    return;
-  }
-
-  if (command === `${prefix}fissures`) {
-    await updateWorldState();
-    let embed = await generateEmbed.fissuresEmbed(worldState);
-    message.channel.send(embed);
-    return;
-  }
-
-  if (command === `${prefix}baro`) {
-    await updateWorldState();
-    let embed = await generateEmbed.BaroEmbed(worldState);
-    message.channel.send(embed);
-    return;
-  }
+      });
+  } */
 });
+
+bot.on("debug", console.log);
 
 bot.login(token);
