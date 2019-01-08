@@ -2,8 +2,8 @@ const myTools = require("../Helpers/myTools");
 const Discord = require("discord.js");
 const footerIcon = "warframeLogo.jpg";
 
-let makeEmbed = (pos, wordlstate) => {
-  let alert = worldstate.alerts[pos];
+let makeEmbed = (pos, alerts) => {
+  let alert = alerts[pos];
 
   //Gets alert title
   let str = alert.mission.reward.asString;
@@ -48,48 +48,8 @@ let makeEmbed = (pos, wordlstate) => {
 
 module.exports.run = (bot, message, args) => {
   myTools.updateWorldState().then(worldstate => {
-    let pos = 0;
-    botID = bot.user.id;
-    let embed = makeEmbed(pos, worldstate);
-    message.channel.send(embed).then(sentMsg => {
-      //Add nav reactions
-      sentMsg.react("⏮").then(() => {
-        sentMsg.react("◀").then(() => {
-          sentMsg.react("▶").then(() => {
-            sentMsg.react("⏭").then(() => {
-              const filter = (reaction, user) => {
-                let { name } = reaction.emoji;
-                return (
-                  (name === "⏮" ||
-                    name === "◀" ||
-                    name === "▶" ||
-                    name === "⏭") &&
-                  user.id != botID
-                );
-              };
-              const collector = sentMsg.createReactionCollector(filter, {
-                time: 30000
-              });
-              collector.on("collect", reaction => {
-                let { name } = reaction.emoji;
-                if (name === "⏮") pos = 0;
-                else if (name === "◀") pos -= pos > 0 ? -1 : 0;
-                else if (name === "▶")
-                  pos += pos < worldstate.alerts.length - 1 ? 1 : 0;
-                else if (name === "⏭") pos = worldstate.alerts.length - 1;
-                let embed = makeEmbed(pos, worldstate);
-                sentMsg.edit({
-                  embed,
-                  files: [{ attachment: `images/${footerIcon}` }]
-                });
-                reaction.remove(message.author);
-              });
-              collector.on("end", collected => {});
-            });
-          });
-        });
-      });
-    });
+    let { alerts } = worldstate;
+    myTools.navigationController(bot, message, alerts, makeEmbed);
   });
 };
 

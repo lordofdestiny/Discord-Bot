@@ -172,13 +172,14 @@ bot.on("message", async message => {
     myTools.updateWorldState().then(worldstate => {
       console.log(command);
       console.log(args);
-      let keys = Object.keys(worldstate[args[0]][0]);
-      keys.forEach((key, i) => {
-        console.log(
-          `${i}. ${key} => Type: ${typeof worldstate[args[0]][0][key]}`
-        );
-      });
-      console.log(worldstate[args[0]][0]);
+      if (args.length === 0) console.log(Object.keys(worldstate));
+      else {
+        let keys = Object.keys(worldstate[args[0]]);
+        keys.forEach((key, i) => {
+          console.log(`${i}. ${key} => Type: ${typeof worldstate[args[0]]}`);
+        });
+        console.log(worldstate[args[0]]);
+      }
     });
     return;
   }

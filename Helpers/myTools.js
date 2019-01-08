@@ -56,10 +56,59 @@ let updateWorldState = () => {
   });
 };
 
+let navigationController = (bot, message, embedData, makeEmbed) => {
+  let pos = 0;
+  botID = bot.user.id;
+  let embed = makeEmbed(pos, embedData);
+  message.channel.send(embed).then(response => {
+    //Add nav reactions
+    response.react("⏮").then(() => {
+      response.react("◀").then(() => {
+        response.react("▶").then(() => {
+          response.react("⏭").then(() => {
+            const filter = (reaction, user) => {
+              let { name } = reaction.emoji;
+              return (
+                (name === "⏮" ||
+                  name === "◀" ||
+                  name === "▶" ||
+                  name === "⏭") &&
+                user.id != botID
+              );
+            };
+            let length = 30000; //30000 is default value, 30seconds
+            const collector = response.createReactionCollector(filter, {
+              time: length
+            });
+            collector.on("collect", reaction => {
+              let { name } = reaction.emoji;
+              if (name === "⏮") pos = 0;
+              else if (name === "◀") pos -= pos > 0 ? 1 : 0;
+              else if (name === "▶") pos += pos < embedData.length - 1 ? 1 : 0;
+              else if (name === "⏭") pos = embedData.length - 1;
+              let embed = makeEmbed(pos, embedData);
+              response.edit(embed).then(() => {
+                reaction.remove(message.author);
+              });
+            });
+            collector.on("end", collected => {
+              console.log("Collecting done!");
+              response.reactions.array().forEach(reaction => {
+                reaction.remove(bot.user);
+              });
+            });
+          });
+        });
+      });
+    });
+  });
+};
+
 module.exports = {
   deleteMessage,
   snap,
   rgbIntToRgb,
   getJoke,
-  updateWorldState
+  updateWorldState,
+  navigationController
 };

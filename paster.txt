@@ -1,11 +1,11 @@
---timestamp--
-news
+timestamp//time when worldsate was requested
+--news--
 events
 --alerts--
 --sortie--
 syndicateMissions
 --fissures--
-globalUpgrades
+globalUpgrades//Just an empty array
 flashSales
 --invasions--
 darkSectors
@@ -14,6 +14,6 @@ dailyDeals
 simaris
 conclaveChallenges
 persistentEnemies
-earthCycle
-cetusCycle
+--earthCycle--
+--cetusCycle--
 constructionProgress
