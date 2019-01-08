@@ -9,6 +9,10 @@ module.exports.run = (bot, message, args) => {
 
 module.exports.help = {
   name: "snap",
-  title: "Ask Thanos if he snapped you from existance!",
-  add: "*tts"
+  variants: [
+    {
+      title: "Ask Thanos if he snapped you from existance!",
+      add: "*tts"
+    }
+  ]
 };

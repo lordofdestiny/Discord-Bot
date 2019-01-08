@@ -56,11 +56,22 @@ let updateWorldState = () => {
   });
 };
 
-let navigationController = (bot, message, embedData, makeEmbed) => {
-  let pos = 0;
+let navigationController = (
+  bot,
+  message,
+  embedData,
+  makeEmbed,
+  duration = 30000,
+  enable = true,
+  startPage = 0,
+  pages = embedData.length
+) => {
+  let pos = startPage;
   botID = bot.user.id;
   let embed = makeEmbed(pos, embedData);
+
   message.channel.send(embed).then(response => {
+    if (!enable) return;
     //Add nav reactions
     response.react("⏮").then(() => {
       response.react("◀").then(() => {
@@ -76,16 +87,15 @@ let navigationController = (bot, message, embedData, makeEmbed) => {
                 user.id != botID
               );
             };
-            let length = 30000; //30000 is default value, 30seconds
             const collector = response.createReactionCollector(filter, {
-              time: length
+              time: duration
             });
             collector.on("collect", reaction => {
               let { name } = reaction.emoji;
               if (name === "⏮") pos = 0;
               else if (name === "◀") pos -= pos > 0 ? 1 : 0;
-              else if (name === "▶") pos += pos < embedData.length - 1 ? 1 : 0;
-              else if (name === "⏭") pos = embedData.length - 1;
+              else if (name === "▶") pos += pos < pages - 1 ? 1 : 0;
+              else if (name === "⏭") pos = pages - 1;
               let embed = makeEmbed(pos, embedData);
               response.edit(embed).then(() => {
                 reaction.remove(message.author);

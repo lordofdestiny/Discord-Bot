@@ -11,11 +11,11 @@ module.exports.run = (bot, message, args) => {
 };
 
 module.exports.help = {
-  name: "echo",
+  name: "invitation",
   variants: [
     {
-      title: "Bot says what you tell him to:",
-      add: "<text> *tts"
+      title: `Generates invitation link for this Bot to join server!`,
+      add: ""
     }
   ]
 };

@@ -67,6 +67,10 @@ module.exports.run = (bot, message, args) => {
 
 module.exports.help = {
   name: "news",
-  title: "English Warframe news!",
-  add: ""
+  variants: [
+    {
+      title: "English Warframe news!",
+      add: ""
+    }
+  ]
 };

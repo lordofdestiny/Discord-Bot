@@ -6,6 +6,10 @@ module.exports.run = (bot, message, args) => {
 
 module.exports.help = {
   name: "creator",
-  title: "I will tell you my creator!",
-  add: ""
+  variants: [
+    {
+      title: "I will tell you my creator!",
+      add: ""
+    }
+  ]
 };

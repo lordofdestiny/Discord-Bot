@@ -40,6 +40,10 @@ module.exports.run = (bot, message, args) => {
 
 module.exports.help = {
   name: "fissures",
-  title: "Current Fissure missions!",
-  add: ""
+  variants: [
+    {
+      title: "Current Fissure missions!",
+      add: ""
+    }
+  ]
 };

@@ -23,6 +23,7 @@ fs.readdir("./commands", (err, files) => {
   jsFiles.forEach((f, i) => {
     let props = require(`./commands/${f}`);
     //console.log(`Loading ${i + 1}. command... `);
+    let help = props.help;
     bot.commands.set(props.help.name, props);
   });
   console.log("All commands loaded!");
@@ -188,6 +189,7 @@ bot.on("message", async message => {
   if (cmd) {
     cmd.run(bot, message, args);
     console.log(`Served !${cmd.help.name} to ${message.author.username}`);
+    message.react("✅");
   } else message.reply(`To get list of commands type ${prefix}help`);
 
   /*  if (command === `${prefix}sorry`) {

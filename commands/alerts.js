@@ -55,6 +55,5 @@ module.exports.run = (bot, message, args) => {
 
 module.exports.help = {
   name: "alerts",
-  title: "List current Alerts!",
-  add: ""
+  variants: [{ title: "List current Alerts!", add: "" }]
 };

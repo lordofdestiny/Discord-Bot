@@ -33,7 +33,11 @@ module.exports.run = (bot, message, args) => {
 };
 
 module.exports.help = {
-  name: "baro",
-  title: "Shows Baro Ki'Teer's items!",
-  add: ""
+  name: "trader",
+  variants: [
+    {
+      title: "Shows Baro Ki'Teer's items!",
+      add: ""
+    }
+  ]
 };

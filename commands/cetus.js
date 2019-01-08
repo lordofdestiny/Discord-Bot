@@ -11,6 +11,5 @@ module.exports.run = (bot, message, args) => {
 
 module.exports.help = {
   name: "cetus",
-  title: "Cetus Day/Night cycle!",
-  add: ""
+  variants: [{ title: "Cetus Day/Night cycle!", add: "" }]
 };

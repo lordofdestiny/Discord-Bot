@@ -12,6 +12,5 @@ module.exports.run = (bot, message, args) => {
 
 module.exports.help = {
   name: "joke",
-  title: "Bot tells you a joke!",
-  add: "*tts"
+  variants: [{ title: "Bot tells you a joke!", add: "*tts" }]
 };
