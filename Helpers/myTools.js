@@ -61,6 +61,7 @@ let navigationController = (
   message,
   embedData,
   makeEmbed,
+  optionalMakeEmbedArguments = {},
   duration = 30000,
   enable = true,
   startPage = 0,
@@ -68,7 +69,7 @@ let navigationController = (
 ) => {
   let pos = startPage;
   botID = bot.user.id;
-  let embed = makeEmbed(pos, embedData);
+  let embed = makeEmbed(pos, embedData, optionalMakeEmbedArguments);
 
   message.channel.send(embed).then(response => {
     if (!enable) return;
@@ -96,7 +97,7 @@ let navigationController = (
               else if (name === "◀") pos -= pos > 0 ? 1 : 0;
               else if (name === "▶") pos += pos < pages - 1 ? 1 : 0;
               else if (name === "⏭") pos = pages - 1;
-              let embed = makeEmbed(pos, embedData);
+              let embed = makeEmbed(pos, embedData, optionalMakeEmbedArguments);
               response.edit(embed).then(() => {
                 reaction.remove(message.author);
               });

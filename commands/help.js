@@ -20,14 +20,14 @@ let countCommands = commands => {
   return count;
 };
 
-let makeEmbed = (page, commands) => {
+let makeEmbed = (page, commands, args) => {
   let embed = new Discord.RichEmbed()
     .setTitle("Help!")
     .setColor(color)
     .setThumbnail(`attachment://${dragon}`)
     .setTimestamp();
 
-  let { args } = this;
+  args = args.args;
   let startIndex = page * commandsPerPage;
   let endIndex = (page + 1) * commandsPerPage;
   let maxPage = countCommands(commands) / commandsPerPage;
@@ -68,11 +68,13 @@ module.exports.run = (bot, message, args) => {
   let { commands } = bot;
   let enabled = isEnableNavigation(args);
   let pageIsGiven = !isNaN(args[0]);
+  console.log(commands);
   myTools.navigationController(
     bot,
     message,
     commands,
-    makeEmbed.bind({ args: args }),
+    makeEmbed,
+    { args: args },
     60 * 1000,
     enabled,
     pageIsGiven ? parseInt(args[0]) : 0,
