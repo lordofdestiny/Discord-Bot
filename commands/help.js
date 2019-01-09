@@ -7,49 +7,7 @@ const commandsPerPage = 5;
 
 let isEnableNavigation = args => {
   if (args.length == 0) return true;
-  return isNaN(args[0]);
-};
-
-let countCommands = commands => {
-  let count = 0;
-  commands.forEach(command => {
-    command.help.variants.forEach(() => {
-      count++;
-    });
-  });
-  return count;
-};
-
-let makeEmbed = (page, commands, args) => {
-  let embed = new Discord.RichEmbed()
-    .setTitle("Help!")
-    .setColor(color)
-    .setThumbnail(`attachment://${dragon}`)
-    .setTimestamp();
-
-  args = args.args;
-  let startIndex = page * commandsPerPage;
-  let endIndex = (page + 1) * commandsPerPage;
-  let maxPage = countCommands(commands) / commandsPerPage;
-
-  if (args.length === 0) {
-    for (let i = startIndex; i < endIndex; i++) {
-      addVariants(embed, commands[i]);
-    }
-    embed.setFooter(
-      `Page ${page + 1}/${maxPage}* Denotes optional parameter`,
-      `attachment://${dragon}`
-    );
-  } else if (isNaN(args[0])) {
-    let command = commands.get(args[0]);
-    addVariants(embed, command);
-    embed.setFooter("* Denotes optional parameter", `attachment://${dragon}`);
-  }
-
-  return {
-    embed,
-    files: [{ attachment: `images/${dragon}` }]
-  };
+  return !isNaN(args[0]);
 };
 
 let addVariants = (embed, command) => {
@@ -60,15 +18,60 @@ let addVariants = (embed, command) => {
   });
 };
 
+let makeEmbed = (page, commands, duration, expired, args) => {
+  let embed = new Discord.RichEmbed()
+    .setTitle("Help!")
+    .setColor(color)
+    .setThumbnail(`attachment://${dragon}`)
+    .setTimestamp();
+
+  args = args.args;
+
+  let commandNames = Array.from(commands.keys());
+
+  let footerText = `* Denotes optional parameter \u2022 ${
+    expired ? "Expired" : `Expires in ${Math.round(duration / 1000)}s`
+  }`;
+
+  if (args.length === 0) {
+    let commandCount = commands.size;
+    let startIndex = page * commandsPerPage;
+    let maxPage = Math.ceil(commandCount / commandsPerPage);
+    let endIndex = startIndex + commandsPerPage;
+
+    for (let i = startIndex; i < endIndex && i < commandCount; i++) {
+      let command = commands.get(commandNames[i]);
+      addVariants(embed, command);
+    }
+
+    footerText = `Page ${page + 1}/${maxPage}\u2022` + footerText;
+  } else if (isNaN(args[0])) {
+    let command = commands.get(args[0]);
+    addVariants(embed, command);
+    embed.setFooter(footerText, `attachment://${dragon}`);
+  }
+
+  embed.setFooter(footerText);
+
+  return {
+    embed,
+    files: [{ attachment: `images/${dragon}` }]
+  };
+};
+
 module.exports.run = (bot, message, args) => {
-  if (bot.commands.get(args[0]) == undefined && args.length != 0) {
+  if (
+    !(
+      args.length === 0 ||
+      (args.length === 1 || bot.commands.get(args[0]) != undefined)
+    )
+  ) {
     message.channel.send("I don't understand!");
     return;
   }
   let { commands } = bot;
   let enabled = isEnableNavigation(args);
   let pageIsGiven = !isNaN(args[0]);
-  console.log(commands);
   myTools.navigationController(
     bot,
     message,
@@ -78,10 +81,8 @@ module.exports.run = (bot, message, args) => {
     60 * 1000,
     enabled,
     pageIsGiven ? parseInt(args[0]) : 0,
-    countCommands(bot.commands) / commandsPerPage
+    Math.ceil(commands.size / commandsPerPage)
   );
-
-  message.channel.send(embed);
 };
 
 module.exports.help = {

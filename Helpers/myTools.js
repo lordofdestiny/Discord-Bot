@@ -69,7 +69,13 @@ let navigationController = (
 ) => {
   let pos = startPage;
   botID = bot.user.id;
-  let embed = makeEmbed(pos, embedData, optionalMakeEmbedArguments);
+  let embed = makeEmbed(
+    pos,
+    embedData,
+    duration,
+    false,
+    optionalMakeEmbedArguments
+  );
 
   message.channel.send(embed).then(response => {
     if (!enable) return;
@@ -85,7 +91,8 @@ let navigationController = (
                   name === "◀" ||
                   name === "▶" ||
                   name === "⏭") &&
-                user.id != botID
+                user.id != botID &&
+                user.id === message.author.id
               );
             };
             const collector = response.createReactionCollector(filter, {
@@ -97,16 +104,27 @@ let navigationController = (
               else if (name === "◀") pos -= pos > 0 ? 1 : 0;
               else if (name === "▶") pos += pos < pages - 1 ? 1 : 0;
               else if (name === "⏭") pos = pages - 1;
-              let embed = makeEmbed(pos, embedData, optionalMakeEmbedArguments);
+              let embed = makeEmbed(
+                pos,
+                embedData,
+                duration,
+                false,
+                optionalMakeEmbedArguments
+              );
               response.edit(embed).then(() => {
                 reaction.remove(message.author);
               });
             });
             collector.on("end", collected => {
               console.log("Collecting done!");
-              response.reactions.array().forEach(reaction => {
-                reaction.remove(bot.user);
-              });
+              let embed = makeEmbed(
+                pos,
+                embedData,
+                duration,
+                true,
+                optionalMakeEmbedArguments
+              );
+              response.edit(embed);
             });
           });
         });

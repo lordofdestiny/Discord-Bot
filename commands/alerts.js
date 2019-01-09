@@ -2,7 +2,7 @@ const myTools = require("../Helpers/myTools");
 const Discord = require("discord.js");
 const footerIcon = "warframeLogo.jpg";
 
-let makeEmbed = (pos, alerts) => {
+let makeEmbed = (pos, alerts, duration, expired) => {
   let alert = alerts[pos];
 
   //Gets alert title
@@ -31,9 +31,9 @@ let makeEmbed = (pos, alerts) => {
     .setFooter(
       "Page " +
         `${parseInt(pos) + 1}` +
-        `/${worldstate.alerts.length} \u2022 ${
-          alert.eta
-        } remaining \u2022 Exiers after 60s`,
+        `/${worldstate.alerts.length} \u2022 ${alert.eta} remaining \u2022 ${
+          expired ? "Expired" : `Expires in ${Math.round(duration / 1000)}s`
+        }`,
       `attachment://${footerIcon}`
     )
     .setTimestamp();

@@ -188,7 +188,7 @@ bot.on("message", async message => {
   let cmd = bot.commands.get(command.slice(prefix.length));
   if (cmd) {
     cmd.run(bot, message, args);
-    console.log(`Served !${cmd.help.name} to ${message.author.username}`);
+    //console.log(`Served !${cmd.help.name} to ${message.author.username}`);
     message.react("✅");
   } else message.reply(`To get list of commands type ${prefix}help`);
 

@@ -24,7 +24,7 @@ let newsColor = news => {
   return color;
 };
 
-let makeEmbed = (pos, news) => {
+let makeEmbed = (pos, news, duration, expired) => {
   let {
     priority,
     link,
@@ -42,7 +42,9 @@ let makeEmbed = (pos, news) => {
     .setTitle(translations.en)
     .setImage(imageLink)
     .setFooter(
-      `Page ${pos + 1}/${news.length} ${priority ? " | Important!" : ""}`,
+      `Page ${pos + 1}/${news.length} \u2022 ${
+        expired ? "Expired" : `Expires in ${Math.round(duration / 1000)}s`
+      }`,
       `attachment://${footerIcon}`
     );
   if (startDate && endDate) {
