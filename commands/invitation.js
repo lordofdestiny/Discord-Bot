@@ -1,13 +1,17 @@
-const myTools = require("../Helpers/myTools");
-const { prefix } = process.env;
+const axios = require("axios");
+const isgd = require("isgd");
 
 module.exports.run = (bot, message, args) => {
-  myTools.deleteMessage(message);
-  let rest = message.content
-    .slice((this.help.name + prefix).length)
-    .replace(" tts", "");
-  let doTts = args[args.length - 1] === "tts";
-  message.channel.send(`${rest}`, { tts: `${doTts}` });
+  bot
+    .generateInvite(["ADMINISTRATOR"])
+    .then(link => {
+      isgd.shorten(link, res => {
+        message.channel.send(`This is the invte link: **${res}**`);
+      });
+    })
+    .catch(error => {
+      console.log(error.stack);
+    });
 };
 
 module.exports.help = {

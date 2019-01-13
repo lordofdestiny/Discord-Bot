@@ -12,16 +12,17 @@ let makeEmbed = worldstate => {
     .setThumbnail("http://i.imgur.com/z0wU29P.png")
     .setTimestamp();
   let { active, startString, location } = voidTrader;
-  if (active) {
+  if (!active) {
     embed.addField(`Landing in: ${startString}`);
     return embed;
+  } else {
+    let { inventory, endString } = voidTrader;
+    inventory.forEach(relic => {
+      let { item, ducats, credits } = relic;
+      embed.addField(item, `${ducats} Ducats + ${credits} Credits`, true);
+    });
+    embed.addField(`Time left in ${location}: `, endString);
   }
-  let { inventory, endString } = voidTrader;
-  inventory.forEach(relic => {
-    let { item, ducats, credits } = relic;
-    embed.addField(item, `${ducats} Ducats + ${credits} Credits`, true);
-  });
-  embed.addField(`Time left in ${location}: `, endString);
   return { embed, files: [{ attachment: `images/${footerIcon}` }] };
 };
 

@@ -4,6 +4,8 @@ module.exports.run = (bot, message, args) => {
   myTools.deleteMessage(message);
   let doTts = args[args.length - 1] === "tts";
   myTools.getJoke().then(joke => {
+    const myRegEx = new RegExp("&quot;", "g");
+    joke = joke.replace(myRegEx, `'`);
     message.channel.send(`${joke}`, {
       tts: `${doTts}`
     });
