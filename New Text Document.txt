@@ -1,0 +1,81 @@
+[ 'events' ]
+0. 0 => Type: object
+[ Event {
+    id: '5c39469d5d13611032f7566f',
+    expiry: 2019-01-19T16:00:01.924Z,
+    maximumScore: 1000000,
+    smallInterval: undefined,
+    largeInterval: undefined,
+    faction: 'Grineer',
+    description: 'Balor Fomorian',
+    tooltip: undefined,
+    node: 'Birog',
+    concurrentNodes: [],
+    victimNode: 'Kronia Relay (Saturn)',
+    scoreLocTag: 'Fomorian Assault Score',
+    rewards: [ [Reward] ],
+    expired: true,
+    health: '0.00',
+    asString:
+     'Balor Fomorian : Grineer\nFomorian Assault Score : 1000000\nRewards:\nOrokin Catalyst + 200000cr\nBattle on Birog\n0.00% Remaining' } ]
+
+
+
+[ Reward {
+    items: [ 'Orokin Catalyst' ],
+    countedItems: [],
+    credits: 200000,
+    asString: 'Orokin Catalyst + 200000cr',
+    itemString: 'Orokin Catalyst',
+    thumbnail: 'https://i.imgur.com/C4X9NWm.png',
+    color: 6855389 } ]
+
+[ Event {
+    id: '5c414e15fa0caf076479fcc8',
+    expiry: 2019-02-09T18:17:40.771Z,
+    maximumScore: undefined,
+    smallInterval: undefined,
+    largeInterval: undefined,
+    faction: undefined,
+    description: 'Ghoul Purge',
+    tooltip: 'Help Konzu Rid The Plains Of Grineer Ghouls',
+    node: undefined,
+    concurrentNodes: [],
+    victimNode: 'Plains of Eidolon (Earth)',
+    scoreLocTag: undefined,
+    rewards: [],
+    expired: false,
+    health: '100.00',
+    affiliatedWith: 'Ostrons',
+    [ [SyndicateJob], [SyndicateJob] ],
+    asString:
+     'Ghoul Purge : undefined\n100.00% Remaining\nOstrons will reward you for performing Purge A Massive Ghoul Burial Site, Rescue The Ghoul Defector jobs' } ]
+
+[ SyndicateJob {
+    id: 'GhoulAlertBountyHunt1549736260771',
+    type: 'Purge A Massive Ghoul Burial Site',
+    enemyLevels: [ 15, 25 ],
+    standingStages: [ 250, 250, 250, 370 ],
+    rewardPool:
+     [ '100 Endo',
+       'Lith B3 Relic',
+       'Lith P1 Relic',
+       'Hunter Adrenaline',
+       'Encrypted Journal Fragment',
+       'Hunter Munitions',
+       'Stubba Blueprint',
+       'Hunter Track' ] },
+  SyndicateJob {
+    id: 'GhoulAlertBountyRes1549736260771',
+    type: 'Rescue The Ghoul Defector',
+    enemyLevels: [ 40, 50 ],
+    standingStages: [ 550, 550, 550, 810 ],
+    rewardPool:
+     [ '300 Endo',
+       'Neo L1 Relic',
+       'Neo V7 Relic',
+       'Hunter Recovery',
+       'Encrypted Journal Fragment',
+       'Hunter Synergy',
+       'Quartakk Blueprint',
+       'Hunter Command' ] } ]

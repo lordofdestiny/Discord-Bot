@@ -1,0 +1,30 @@
+[
+  {
+    "id": "5c39469d5d13611032f7566f",
+    "expiry": "2019-01-19T16:00:01.924Z",
+    "maximumScore": 1000000,
+    "smallInterval": null,
+    "largeInterval": null,
+    "faction": "Grineer",
+    "description": "Balor Fomorian",
+    "tooltip": null,
+    "node": "Birog",
+    "concurrentNodes": [],
+    "victimNode": "Kronia Relay (Saturn)",
+    "scoreLocTag": "Fomorian Assault Score",
+    "rewards": [
+      {
+        "items": ["Orokin Catalyst"],
+        "countedItems": [],
+        "credits": 200000,
+        "asString": "Orokin Catalyst + 200000cr",
+        "itemString": "Orokin Catalyst",
+        "thumbnail": "https://i.imgur.com/C4X9NWm.png",
+        "color": 6855389
+      }
+    ],
+    "expired": true,
+    "health": "0.00",
+    "asString": "Balor Fomorian : Grineer\nFomorian Assault Score : 1000000\nRewards:\nOrokin Catalyst + 200000cr\nBattle on Birog\n0.00% Remaining"
+  }
+]

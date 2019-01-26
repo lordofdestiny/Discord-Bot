@@ -3,28 +3,28 @@ const Discord = require("discord.js");
 const footerIcon = "warframeLogo.jpg";
 const moment = require("moment");
 
-let filterEnglishNews = news => {
+function filterEnglishNews(news) {
   let filtered = news.filter(value => {
     return value.translations.en != undefined;
   });
 
   return filtered.reverse();
-};
+}
 
-let formatDate = date => {
+function formatDate(date) {
   return moment(date).format("MMMM Do YYYY, HH:mm");
-};
+}
 
-let newsColor = news => {
+function newsColor(news) {
   let color = "#F04747";
   let { update, primeAccess, stream } = news;
   if (update) color = "#19B5FE";
   if (primeAccess) color = "#FFA400";
   if (stream) color = "#875F9A";
   return color;
-};
+}
 
-let makeEmbed = (pos, news, duration, expired) => {
+function makeEmbed(pos, news, duration, expired) {
   let {
     priority,
     link,
@@ -42,7 +42,7 @@ let makeEmbed = (pos, news, duration, expired) => {
     .setTitle(translations.en)
     .setImage(imageLink)
     .setFooter(
-      `Page ${pos + 1}/${news.length} \u2022 ${
+      `Page ${pos + 1}/${news.length} • ${
         expired ? "Expired" : `Expires in ${Math.round(duration / 1000)}s`
       }`,
       `attachment://${footerIcon}`
@@ -56,9 +56,13 @@ let makeEmbed = (pos, news, duration, expired) => {
   }
   return {
     embed,
-    files: [{ attachment: `images/${footerIcon}` }]
+    files: [
+      {
+        attachment: `images/${footerIcon}`
+      }
+    ]
   };
-};
+}
 
 module.exports.run = (bot, message, args) => {
   myTools.updateWorldState().then(worldstate => {

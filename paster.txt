@@ -1,6 +1,6 @@
 timestamp//time when worldsate was requested
 --news--
-events
+events //In progress need's testing over time
 --alerts--
 --sortie--
 syndicateMissions

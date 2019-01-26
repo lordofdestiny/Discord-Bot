@@ -2,9 +2,9 @@ const myTools = require("../Helpers/myTools");
 const Discord = require("discord.js");
 const footerIcon = "warframeLogo.jpg";
 const invasionsImage = "https://i.imgur.com/QUPS0ql.png";
-const color = "#F04747";
+const color = process.env.BOT_COLOR;
 
-let makeEmbed = worldstate => {
+function makeEmbed(worldstate) {
   let invasions = worldstate.invasions;
   let embed = new Discord.RichEmbed()
     .setTitle("[PC] Invasions")
@@ -36,9 +36,13 @@ let makeEmbed = worldstate => {
 
   return {
     embed,
-    files: [{ attachment: `images/${footerIcon}` }]
+    files: [
+      {
+        attachment: `images/${footerIcon}`
+      }
+    ]
   };
-};
+}
 
 module.exports.run = (bot, message, args) => {
   myTools.updateWorldState().then(worldstate => {
@@ -49,5 +53,10 @@ module.exports.run = (bot, message, args) => {
 
 module.exports.help = {
   name: "invasions",
-  variants: [{ title: "List current Invasions!", add: "" }]
+  variants: [
+    {
+      title: "List current Invasions!",
+      add: ""
+    }
+  ]
 };

@@ -1,4 +1,3 @@
-const axios = require("axios");
 const isgd = require("isgd");
 
 module.exports.run = (bot, message, args) => {

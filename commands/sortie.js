@@ -5,9 +5,15 @@ const sortieIcon =
   "https://vignette.wikia.nocookie.net/warframe/images/1/15/Sortie_b.png/revision/latest?cb=20151217134250";
 const color = "#F04747";
 
-let makeEmbed = worldsate => {
-  let { sortie } = worldstate;
-  let { faction, boss, eta } = sortie;
+function makeEmbed(worldsate) {
+  let {
+    sortie
+  } = worldstate;
+  let {
+    faction,
+    boss,
+    eta
+  } = sortie;
   let embed = new Discord.RichEmbed()
     .setTitle("[PC] Sortie")
     .setDescription(`Agianst: ${faction} - **${boss}**`)
@@ -16,13 +22,19 @@ let makeEmbed = worldsate => {
     .setFooter(`${eta} remaining`, `attachment://${footerIcon}`)
     .setTimestamp();
   sortie.variants.forEach(mission => {
-    let { node, missionType, modifier } = mission;
+    let {
+      node,
+      missionType,
+      modifier
+    } = mission;
     embed.addField(`${node} - ${missionType}`, `${modifier}`);
   });
 
   return {
     embed,
-    files: [{ attachment: `images/${footerIcon}` }]
+    files: [{
+      attachment: `images/${footerIcon}`
+    }]
   };
 };
 
@@ -35,10 +47,8 @@ module.exports.run = (bot, message, args) => {
 
 module.exports.help = {
   name: "sortie",
-  variants: [
-    {
-      title: "Current Sortie missions!",
-      add: ""
-    }
-  ]
+  variants: [{
+    title: "Current Sortie missions!",
+    add: ""
+  }]
 };

@@ -1,24 +1,23 @@
 const Discord = require("discord.js");
 const myTools = require("../Helpers/myTools");
 const dragon = "botAvatar.png";
-const { prefix } = process.env;
-const color = "#F04747";
+const { prefix, BOT_COLOR: color } = process.env;
 const commandsPerPage = 5;
 
-let isEnableNavigation = args => {
+function isEnableNavigation(args) {
   if (args.length == 0) return true;
   return !isNaN(args[0]);
-};
+}
 
-let addVariants = (embed, command) => {
+function addVariants(embed, command) {
   let { name, variants } = command.help;
   variants.forEach(variant => {
     let { title, add } = variant;
     embed.addField(title, `${"```"}${prefix}${name} ${add}${"```"}`);
   });
-};
+}
 
-let makeEmbed = (page, commands, duration, expired, args) => {
+function makeEmbed(page, commands, duration, expired, args) {
   let embed = new Discord.RichEmbed()
     .setTitle("Help!")
     .setColor(color)
@@ -29,7 +28,7 @@ let makeEmbed = (page, commands, duration, expired, args) => {
 
   let commandNames = Array.from(commands.keys());
 
-  let footerText = `* Denotes optional parameter \u2022 ${
+  let footerText = `* Denotes optional parameter • ${
     expired ? "Expired" : `Expires in ${Math.round(duration / 1000)}s`
   }`;
 
@@ -44,7 +43,7 @@ let makeEmbed = (page, commands, duration, expired, args) => {
       addVariants(embed, command);
     }
 
-    footerText = `Page ${page + 1}/${maxPage}\u2022` + footerText;
+    footerText = `Page ${page + 1}/${maxPage}•` + footerText;
   } else if (isNaN(args[0])) {
     let command = commands.get(args[0]);
     addVariants(embed, command);
@@ -55,9 +54,13 @@ let makeEmbed = (page, commands, duration, expired, args) => {
 
   return {
     embed,
-    files: [{ attachment: `images/${dragon}` }]
+    files: [
+      {
+        attachment: `images/${dragon}`
+      }
+    ]
   };
-};
+}
 
 module.exports.run = (bot, message, args) => {
   if (
@@ -77,7 +80,9 @@ module.exports.run = (bot, message, args) => {
     message,
     commands,
     makeEmbed,
-    { args: args },
+    {
+      args: args
+    },
     60 * 1000,
     enabled,
     pageIsGiven ? parseInt(args[0]) : 0,

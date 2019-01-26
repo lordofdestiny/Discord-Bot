@@ -1,9 +1,8 @@
 const myTools = require("../Helpers/myTools");
 const Discord = require("discord.js");
 const footerIcon = "warframeLogo.jpg";
-const color = "#F04747";
-const fissureImage =
-  "https://vignette.wikia.nocookie.net/warframe/images/5/57/VoidTearIcon_b.png/revision/latest?cb=20160713085454";
+const color = process.env.BOT_COLOR;
+const fissureImage = process.env.fissureIcon;
 
 let makeEmbed = worldstate => {
   let embed = new Discord.RichEmbed()

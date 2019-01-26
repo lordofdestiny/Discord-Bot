@@ -1,9 +1,9 @@
 const Discord = require("discord.js");
 const myTools = require("../Helpers/myTools");
 const footerIcon = "warframeLogo.jpg";
-const color = "#F04747";
+const color = process.env.BOT_COLOR;
 
-let makeEmbed = worldstate => {
+function makeEmbed(worldstate) {
   let { voidTrader } = worldstate;
   let embed = new Discord.RichEmbed()
     .setTitle("Void Trader")
@@ -24,7 +24,7 @@ let makeEmbed = worldstate => {
     embed.addField(`Time left in ${location}: `, endString);
   }
   return { embed, files: [{ attachment: `images/${footerIcon}` }] };
-};
+}
 
 module.exports.run = (bot, message, args) => {
   myTools.updateWorldState().then(worldsate => {
